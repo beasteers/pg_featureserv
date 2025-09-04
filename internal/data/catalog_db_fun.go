@@ -240,15 +240,22 @@ func removeNames(names []string, ex1 string, ex2 string) []string {
 
 func readDataWithArgs(ctx context.Context, db *pgxpool.Pool, propCols []string, sql string, args []interface{}) ([]map[string]interface{}, error) {
 	start := time.Now()
-	rows, err := db.Query(context.Background(), sql, args...)
+	var out []map[string]interface{}
+	err := withRoleConn(ctx, db, func(conn *pgxpool.Conn) error {
+		rows, err := conn.Query(ctx, sql, args...)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+		out = scanData(ctx, rows, propCols)
+		return nil
+	})
 	if err != nil {
 		log.Warnf("Error running Data query: %v", err)
 		return nil, err
 	}
-	defer rows.Close()
-	data := scanData(ctx, rows, propCols)
-	log.Debugf(fmtQueryStats, len(data), time.Since(start))
-	return data, nil
+	log.Debugf(fmtQueryStats, len(out), time.Since(start))
+	return out, nil
 }
 
 func scanData(ctx context.Context, rows pgx.Rows, propCols []string) []map[string]interface{} {

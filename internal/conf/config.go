@@ -52,6 +52,17 @@ func setDefaultConfig() {
 	viper.SetDefault("Metadata.Description", "Crunchy Data Feature Server for PostGIS")
 
 	viper.SetDefault("Website.BasemapUrl", "")
+
+	// Auth defaults
+	viper.SetDefault("Auth.JWTEnabled", false)
+	viper.SetDefault("Auth.JWTRoleClaim", "role")
+	viper.SetDefault("Auth.JWTAnonymousRole", "")
+	viper.SetDefault("Auth.JWTHS256Secret", "")
+	viper.SetDefault("Auth.JWTPublicKeyFile", "")
+	viper.SetDefault("Auth.JWTPublicKeyURL", "")
+	viper.SetDefault("Auth.JWTIssuer", "")
+	viper.SetDefault("Auth.JWTAudience", "")
+	viper.SetDefault("Auth.JWKSRefreshSec", 300)
 }
 
 // Config for system
@@ -60,6 +71,7 @@ type Config struct {
 	Paging   Paging
 	Metadata Metadata
 	Database Database
+	Auth     Auth
 	Website  Website
 }
 
@@ -94,6 +106,29 @@ type Database struct {
 	TableIncludes         []string
 	TableExcludes         []string
 	FunctionIncludes      []string
+}
+
+// Auth config
+type Auth struct {
+	// Enable JWT-based role mapping
+	JWTEnabled bool
+	// Role claim name inside JWT (e.g., "role", "pg_role")
+	JWTRoleClaim string
+	// Default role to use when no/invalid token present
+	JWTAnonymousRole string
+	// HMAC secret for HS256 tokens (optional)
+	JWTHS256Secret string
+	// Path to RSA/ECDSA public key PEM file for verifying RS256/ES256 tokens (optional)
+	JWTPublicKeyFile string
+	// URL to fetch a JWKS or PEM public key. If set to an HTTPS URL, the
+	// verifier will fetch and cache keys from this endpoint.
+	JWTPublicKeyURL string
+	// Expected issuer (optional)
+	JWTIssuer string
+	// Expected audience (optional)
+	JWTAudience string
+	// JWKS refresh interval in seconds (when using URL-based JWKS)
+	JWKSRefreshSec int
 }
 
 // Metadata config

@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/CrunchyData/pg_featureserv/internal/api"
+	"github.com/CrunchyData/pg_featureserv/internal/auth"
 	"github.com/CrunchyData/pg_featureserv/internal/conf"
 	"github.com/CrunchyData/pg_featureserv/internal/ui"
 	"github.com/gorilla/mux"
@@ -61,6 +62,32 @@ type appHandler func(http.ResponseWriter, *http.Request) *appError
 func (fn appHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// --- log the request
 	log.Printf("%v %v %v\n", r.RemoteAddr, r.Method, r.URL)
+
+	// Attach DB role context derived from JWT (if enabled)
+	if conf.Configuration.Auth.JWTEnabled {
+		role := conf.Configuration.Auth.JWTAnonymousRole
+		sub := ""
+		// Parse Authorization: Bearer <token>
+		authz := r.Header.Get("Authorization")
+		if strings.HasPrefix(strings.ToLower(authz), "bearer ") {
+			tok := strings.TrimSpace(authz[7:])
+			if claims, err := auth.VerifyAndExtract(tok); err == nil {
+				if rc := auth.RoleFromClaims(claims); rc != "" {
+					role = rc
+				}
+				if s, ok := claims["sub"].(string); ok {
+					sub = s
+				}
+			} else {
+				log.Debugf("JWT invalid, using anonymous role: %v", err)
+			}
+		}
+		ctx := auth.WithRole(r.Context(), role)
+		if sub != "" {
+			ctx = auth.WithSubject(ctx, sub)
+		}
+		r = r.WithContext(ctx)
+	}
 
 	// signal for normal completion of handler
 	handlerDone := make(chan struct{})

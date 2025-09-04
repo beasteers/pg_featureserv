@@ -83,3 +83,26 @@ LimitMax = 10000
 [Website]
 # URL for the map view basemap
 BasemapUrl = "http://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
+
+# Optional: JWT-based role mapping
+[Auth]
+# Enable JWT parsing + Postgres role mapping
+# JWTEnabled = true
+# Claim name that contains the Postgres role
+# JWTRoleClaim = "role"
+# Default role to use if no/invalid token provided
+# JWTAnonymousRole = "anon"
+# One of the following verifiers should be configured:
+# - HS256 secret (shared secret with issuer)
+# JWTHS256Secret = ""
+# - RS256 public key: you can provide a local PEM file, a JWKS/PEM URL, or an OIDC issuer for well-known discovery
+# Local PEM file path:
+# JWTPublicKeyFile = "/config/jwt_public.pem"
+# Or: URL to JWKS or PEM (auto-detected):
+# JWTPublicKeyURL = "https://idp.example.com/realms/demo/protocol/openid-connect/certs"
+# Or: OIDC issuer for auto discovery (will fetch .well-known/openid-configuration -> jwks_uri):
+# JWTIssuer = "https://idp.example.com/realms/demo"
+# Optional issuer / audience checks
+# JWTAudience = "my-aud"
+# How often to refresh JWKS (seconds)
+# JWKSRefreshSec = 300

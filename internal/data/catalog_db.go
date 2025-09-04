@@ -388,19 +388,26 @@ func readFeatures(ctx context.Context, db *pgxpool.Pool, sql string, idColIndex 
 //nolint:unused
 func readFeaturesWithArgs(ctx context.Context, db *pgxpool.Pool, sql string, args []interface{}, idColIndex int, propCols []string) ([]string, error) {
 	start := time.Now()
-	rows, err := db.Query(ctx, sql, args...)
+	var out []string
+	err := withRoleConn(ctx, db, func(conn *pgxpool.Conn) error {
+		rows, err := conn.Query(ctx, sql, args...)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+		data, err := scanFeatures(ctx, rows, idColIndex, propCols)
+		if err != nil {
+			return err
+		}
+		out = data
+		return nil
+	})
 	if err != nil {
 		log.Warnf("Error running Features query: %v", err)
 		return nil, err
 	}
-	defer rows.Close()
-
-	data, err := scanFeatures(ctx, rows, idColIndex, propCols)
-	if err != nil {
-		return data, err
-	}
-	log.Debugf(fmtQueryStats, len(data), time.Since(start))
-	return data, nil
+	log.Debugf(fmtQueryStats, len(out), time.Since(start))
+	return out, nil
 }
 
 func scanFeatures(ctx context.Context, rows pgx.Rows, idColIndex int, propCols []string) ([]string, error) {
