@@ -79,6 +79,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          target: multi-stage
           build-args: |
             GOLANG_VERSION=1.21.6
             TARGETARCH=amd64
