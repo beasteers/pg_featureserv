@@ -46,7 +46,7 @@ INSERT INTO receipts (trip_id, time, amount) VALUES
 
 -- View with geometry and featureID column (no PK)
 CREATE VIEW cities_view AS
-  SELECT * FROM cities;
+  SELECT name as id, * FROM cities;
 
 CREATE VIEW trips_view AS
   SELECT trips.*, cities.geom FROM trips LEFT JOIN cities ON trips.city = cities.name;
