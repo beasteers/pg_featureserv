@@ -79,6 +79,13 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            GOLANG_VERSION=1.21.6
+            TARGETARCH=amd64
+            PLATFORM=amd64
+            BASE_REGISTRY=registry.access.redhat.com
+            BASE_IMAGE=ubi8-micro
+            VERSION=${{ github.ref_name }}
 
       # Sign the resulting Docker image digest except on PRs.
       # This will only write to the public Rekor transparency log when the Docker
