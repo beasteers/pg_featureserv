@@ -44,6 +44,7 @@ func setDefaultConfig() {
 	viper.SetDefault("Database.TableIncludes", []string{})
 	viper.SetDefault("Database.TableExcludes", []string{})
 	viper.SetDefault("Database.FunctionIncludes", []string{"postgisftw"})
+	viper.SetDefault("Database.IdColumn", "id")
 
 	viper.SetDefault("Temporal.InstantColumns", []string{"time"})
 	viper.SetDefault("Temporal.StartColumns", []string{"start_time"})
@@ -99,6 +100,7 @@ type Database struct {
 	TableIncludes         []string
 	TableExcludes         []string
 	FunctionIncludes      []string
+	IdColumn              string
 }
 
 // Metadata config
