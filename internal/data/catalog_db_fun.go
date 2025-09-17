@@ -131,7 +131,6 @@ func scanFunctionDef(rows pgx.Rows) *Function {
 		OutJSONTypes:    outJSONTypes,
 		Types:           datatypes,
 		GeometryColumn:  geomCol,
-		IDColumn:        FunctionIDColumnName,
 		StartTimeColumn: startTimeColumn,
 		EndTimeColumn:   endTimeColumn,
 	}
